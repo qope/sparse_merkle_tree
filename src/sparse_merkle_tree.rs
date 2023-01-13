@@ -157,10 +157,10 @@ mod tests {
     #[test]
     fn tree_test() {
         let mut rng = rand::thread_rng();
-        let height = 4usize;
+        let height = 100;
         let mut tree = SparseMerkleTree::<F, H>::new(height);
 
-        for _ in 0..100 {
+        for _ in 0..10000 {
             let index = rng.gen_range(0..1 << height);
             let path = usize_to_vec(index, height);
             let new_leaf = F::rand_vec(4);
