@@ -1,20 +1,6 @@
 use plonky2::{
-    field::types::{Field, Sample},
-    hash::{
-        hash_types::RichField,
-        merkle_proofs::{verify_merkle_proof_to_cap, MerkleProof, MerkleProofTarget},
-        merkle_tree::MerkleTree,
-        poseidon::PoseidonHash,
-    },
-    iop::{
-        target::Target,
-        witness::{PartialWitness, WitnessWrite},
-    },
-    plonk::{
-        circuit_builder::CircuitBuilder,
-        circuit_data::CircuitConfig,
-        config::{GenericConfig, Hasher, PoseidonGoldilocksConfig},
-    },
+    hash::{hash_types::RichField, merkle_proofs::MerkleProof},
+    plonk::config::Hasher,
 };
 
 use std::collections::HashMap;
@@ -145,7 +131,11 @@ impl<F: RichField, H: Hasher<F>> Node<F, H> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use plonky2::hash::merkle_proofs::verify_merkle_proof;
+    use plonky2::{
+        field::types::Sample,
+        hash::{merkle_proofs::verify_merkle_proof, poseidon::PoseidonHash},
+        plonk::config::{GenericConfig, PoseidonGoldilocksConfig},
+    };
     use rand::Rng;
 
     const D: usize = 2;
