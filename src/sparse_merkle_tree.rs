@@ -7,13 +7,13 @@ use std::collections::HashMap;
 
 #[derive(Debug)]
 pub struct SparseMerkleTree<F: RichField, H: Hasher<F>> {
-    pub height: u32,
+    pub height: usize,
     pub nodes: HashMap<Vec<bool>, Node<F, H>>,
     zero_hashes: Vec<H::Hash>,
 }
 
 impl<F: RichField, H: Hasher<F>> SparseMerkleTree<F, H> {
-    pub fn new(height: u32) -> Self {
+    pub fn new(height: usize) -> Self {
         // zero_hashes = reverse([H(zero_leaf), H(H(zero_leaf), H(zero_leaf)), ...])
         let mut zero_hashes = vec![];
         let node = Node::Leaf::<F, H> {
@@ -38,7 +38,7 @@ impl<F: RichField, H: Hasher<F>> SparseMerkleTree<F, H> {
     }
 
     pub fn get_leaf(&self, path: &Vec<bool>) -> Vec<F> {
-        assert_eq!(path.len(), self.height as usize);
+        assert_eq!(path.len(), self.height);
         match self.nodes.get(path) {
             Some(Node::Leaf { value }) => value.clone(),
             _ => panic!(),
@@ -46,7 +46,7 @@ impl<F: RichField, H: Hasher<F>> SparseMerkleTree<F, H> {
     }
 
     pub fn get_node_hash(&self, path: &Vec<bool>) -> H::Hash {
-        assert!(path.len() <= self.height as usize);
+        assert!(path.len() <= self.height);
         match self.nodes.get(path) {
             Some(node) => node.hash(),
             None => self.zero_hashes[path.len()],
@@ -67,7 +67,7 @@ impl<F: RichField, H: Hasher<F>> SparseMerkleTree<F, H> {
     }
 
     pub fn update(&mut self, path: &Vec<bool>, value: Vec<F>) {
-        assert_eq!(path.len(), self.height as usize);
+        assert_eq!(path.len(), self.height);
         let mut path = path.clone();
 
         self.nodes.insert(path.clone(), Node::Leaf { value });
@@ -98,7 +98,7 @@ impl<F: RichField, H: Hasher<F>> SparseMerkleTree<F, H> {
     }
 
     pub fn prove(&self, path: &Vec<bool>) -> MerkleProof<F, H> {
-        assert_eq!(path.len(), self.height as usize);
+        assert_eq!(path.len(), self.height);
         let mut path = path.clone();
         let mut siblings = vec![];
         loop {
@@ -158,7 +158,7 @@ mod tests {
     fn tree_test() {
         let mut rng = rand::thread_rng();
         let height = 4usize;
-        let mut tree = SparseMerkleTree::<F, H>::new(height as u32);
+        let mut tree = SparseMerkleTree::<F, H>::new(height);
 
         for _ in 0..100 {
             let index = rng.gen_range(0..1 << height);
